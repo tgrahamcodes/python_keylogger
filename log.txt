@@ -1,4 +1,3 @@
 Keylogger started...
 
-hi this is annoying 
- [CAPSLOCK]  [ESC] 
+c<179>Key.ctrlKey.ctrlc
