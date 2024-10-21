@@ -22,6 +22,11 @@ class TestKeylogger(unittest.TestCase):
             on_press("a")
             mock_write.assert_called_once_with('a')
 
+    def test_on_press_esc(self):
+        with patch("keylogger.write_to_file") as mock_write:
+            on_press('Escape')
+            mock_write.assert_called_once_with('Escape')
+
     def test_on_release_escape_key(self):
         # Test the release of the escape key, expect False
         self.assertFalse(on_release(Key.esc))
